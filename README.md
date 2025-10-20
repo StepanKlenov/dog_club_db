@@ -21,13 +21,5 @@
 - SQL
 - Git / GitHub
 
-## Содержание проекта
-restaurant-menu-db/
-├── README.md # этот файл
-├── sql/
-│ └── create_tables.sql # скрипт создания таблиц
-└── diagrams/
-└── er-diagram.png # ERD-схема базы данных
-
 ## Автор
 Кленов Степан Сергеевич Б23-191-1
