@@ -1,51 +1,67 @@
-CREATE TABLE Dish_Types (
-    dish_type_id INT PRIMARY KEY,
-    type_name VARCHAR(100) UNIQUE NOT NULL
+-- ====== Таблица пород ======
+CREATE TABLE Breeds (
+    breed_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    min_height INT CHECK (min_height > 0),
+    max_height INT CHECK (max_height >= min_height),
+    color VARCHAR(50)
 );
 
-CREATE TABLE Dishes (
-    dish_id INT PRIMARY KEY,
-    dish_name VARCHAR(100) NOT NULL,
-    price DECIMAL(8,2) CHECK (price > 0),
-    dish_type_id INT NOT NULL,
-    FOREIGN KEY (dish_type_id) REFERENCES Dish_Types(dish_type_id)
+-- ====== Таблица владельцев ======
+CREATE TABLE Owners (
+    owner_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    address TEXT
 );
 
-CREATE TABLE Components (
-    component_id INT PRIMARY KEY,
-    component_name VARCHAR(100) UNIQUE NOT NULL,
-    calories INT DEFAULT 0 CHECK (calories >= 0),
-    price DECIMAL(8,2) CHECK (price >= 0),
-    weight DECIMAL(6,2) CHECK (weight > 0)
+-- ====== Таблица собак ======
+CREATE TABLE Dogs (
+    dog_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    breed_id INT NOT NULL,
+    owner_id INT,
+    is_alive BOOLEAN DEFAULT TRUE,
+    psych_score INT CHECK (psych_score BETWEEN 0 AND 100),
+    FOREIGN KEY (breed_id) REFERENCES Breeds(breed_id),
+    FOREIGN KEY (owner_id) REFERENCES Owners(owner_id)
 );
 
-CREATE TABLE Dish_Composition (
-    dish_id INT,
-    component_id INT,
-    PRIMARY KEY (dish_id, component_id),
-    FOREIGN KEY (dish_id) REFERENCES Dishes(dish_id) ON DELETE CASCADE,
-    FOREIGN KEY (component_id) REFERENCES Components(component_id)
+-- ====== Таблица родителей ======
+CREATE TABLE Parents (
+    dog_id INT PRIMARY KEY,
+    father_id INT,
+    mother_id INT,
+    FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),
+    FOREIGN KEY (father_id) REFERENCES Dogs(dog_id),
+    FOREIGN KEY (mother_id) REFERENCES Dogs(dog_id)
 );
 
-CREATE TABLE Microelements (
-    microelement_id INT PRIMARY KEY,
-    microelement_name VARCHAR(100) UNIQUE NOT NULL
+-- ====== Таблица болезней ======
+CREATE TABLE Diseases (
+    disease_id INT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    treatment TEXT
 );
 
-CREATE TABLE Component_Composition (
-    component_id INT,
-    microelement_id INT,
-    amount_per_100g DECIMAL(6,2) CHECK (amount_per_100g >= 0),
-    PRIMARY KEY (component_id, microelement_id),
-    FOREIGN KEY (component_id) REFERENCES Components(component_id),
-    FOREIGN KEY (microelement_id) REFERENCES Microelements(microelement_id)
+-- ====== Таблица истории болезней ======
+CREATE TABLE Disease_History (
+    dog_id INT,
+    disease_id INT,
+    date_start DATE NOT NULL,
+    date_end DATE,
+    PRIMARY KEY (dog_id, disease_id, date_start),
+    FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id),
+    FOREIGN KEY (disease_id) REFERENCES Diseases(disease_id),
+    CHECK (date_end IS NULL OR date_end >= date_start)
 );
 
-CREATE TABLE Daily_Microelement_Norms (
-    microelement_id INT PRIMARY KEY,
-    amount_mg DECIMAL(6,2) CHECK (amount_mg > 0),
-    FOREIGN KEY (microelement_id) REFERENCES Microelements(microelement_id)
+-- ====== Таблица выставок ======
+CREATE TABLE Exhibitions (
+    dog_id INT,
+    exhibition_date DATE NOT NULL,
+    grade INT CHECK (grade BETWEEN 1 AND 5),
+    medal VARCHAR(20),
+    PRIMARY KEY (dog_id, exhibition_date),
+    FOREIGN KEY (dog_id) REFERENCES Dogs(dog_id)
 );
-
-
-
